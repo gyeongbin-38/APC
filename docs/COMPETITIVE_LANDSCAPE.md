@@ -42,7 +42,7 @@ Limitations:
 
 | Rank | Skill | RPE | Trigger F1 | `SKILL.md` |
 |---:|---|---:|---:|---:|
-| 1 | APC | **80.39** | **0.720** | **2,366 B** |
+| 1 | APC | **80.39** | **0.720** | **2,579 B** |
 | 2 | Sentry prompt-optimizer | 75.16 | 0.693 | 4,613 B |
 | 3 | Kanner prompt-optimizer | 62.01 | 0.679 | 8,504 B |
 | 4 | Talki prompt-optimizer | 58.34 | 0.704 | 13,558 B |
@@ -70,7 +70,7 @@ A prompt compiler focused on long-running autonomous loops with archetypes, prim
 
 ### `tt-a1i/archify`
 
-Not a prompt competitor. APC borrows the architectural pattern of **typed IR → deterministic validation/rendering** for its own documentation. The architecture artifact is generated using pinned Archify `v2.16.0`.
+Not a prompt competitor. APC borrows the architectural pattern of **typed IR → deterministic validation/rendering** for its own documentation. The architecture artifact is generated from the pinned Archify `v2.16.0` commit.
 
 ## What would change the leaderboard?
 
@@ -80,4 +80,5 @@ A release should not be considered better merely because its RPE score increases
 2. no hard-constraint preservation regression;
 3. model-backed bare-vs-skill task success when credentials/harnesses are available;
 4. no material increase in overprompt on simple tasks;
-5. public-source pins updated before claiming comparison with newer competitor versions.
+5. public-source pins updated before claiming comparison with newer competitor versions;
+6. security posture controls remain green and adversarial model tests do not regress.
