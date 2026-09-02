@@ -1,0 +1,9 @@
+{
+  "objective":"Fix the checkout regression in the existing repository.",
+  "target":"coding agent",
+  "deliverable":"A focused code change with verification results.",
+  "hard_constraints":["Do not change the public API.","Do not refactor unrelated modules."],
+  "success_criteria":["The failing checkout test passes.","Relevant regression tests pass."],
+  "verification":["Run the narrow failing test first, then relevant regression tests."],
+  "complexity":"structured"
+}
