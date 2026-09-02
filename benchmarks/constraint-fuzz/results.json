@@ -1,0 +1,8 @@
+{
+  "method": "deterministic literal-preservation fuzz; optional emitter only",
+  "seed": 20260902,
+  "cases": 10000,
+  "failures": 0,
+  "examples": [],
+  "pass_rate": 1.0
+}
