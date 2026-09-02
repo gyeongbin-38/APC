@@ -32,10 +32,10 @@ Modern models often need *less* prompt scaffolding than prompt-engineering folkl
 
 ## Install
 
-After the GitHub repository is published, the open `skills` CLI can install the skill directly:
+Install directly from GitHub with the open `skills` CLI:
 
 ```bash
-npx skills add gyeongbin-38/adaptive-prompt-compiler --skill adaptive-prompt-compiler
+npx skills add gyeongbin-38/APC --skill adaptive-prompt-compiler
 ```
 
 Or copy `skill/adaptive-prompt-compiler/` into a skills directory supported by your client:
