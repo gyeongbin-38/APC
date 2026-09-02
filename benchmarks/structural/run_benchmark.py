@@ -60,7 +60,9 @@ def make_cases(seed=20260902, n_per=100):
             if cfg["handoff"]: gold.add("handoff")
             if hard >= 2: gold.add("constraints")
             if target: gold.add("targets")
+            # About 12% of structured tasks need evidence-style research guidance.
             if name == "structured" and r.random() < .12: gold.add("research")
+            # About 18% of handoffs are coding handoffs.
             if name == "handoff" and r.random() < .18: gold.add("coding")
             complexity=max(1,len(gold)) + (2 if cfg["long"] else 0) + hard//2
             cases.append(Case(name,gold,hard,complexity))
@@ -68,13 +70,15 @@ def make_cases(seed=20260902, n_per=100):
 
 
 def noisy_route(gold:set[str], r:random.Random, miss:float, add:float):
-    loaded={m for m in gold if r.random() >= miss}
-    for m in ALL-gold:
+    loaded={m for m in sorted(gold) if r.random() >= miss}
+    for m in sorted(ALL-gold):
         if r.random() < add: loaded.add(m)
     return loaded
 
 
 def specialist_route(case:Case, r:random.Random):
+    # Simulates separate overlapping specialist skills: usually one primary,
+    # sometimes one support skill. This is intentionally not an LLM claim.
     primary=[]
     if "coding" in case.gold: primary.append("coding")
     elif "research" in case.gold: primary.append("research")
@@ -83,11 +87,14 @@ def specialist_route(case:Case, r:random.Random):
     elif "constraints" in case.gold: primary.append("constraints")
     elif "targets" in case.gold: primary.append("targets")
     loaded=set(primary[:1])
-    supports=[m for m in case.gold-loaded]
+    supports=sorted(case.gold-loaded)
     r.shuffle(supports)
     if supports and r.random() < .55: loaded.add(supports[0])
+    # Specialist selection ambiguity.
     if loaded and r.random() < .12:
-        loaded.pop(); loaded.add(r.choice(sorted(ALL)))
+        victim=r.choice(sorted(loaded))
+        loaded.remove(victim)
+        loaded.add(r.choice(sorted(ALL)))
     return loaded
 
 CANDIDATES = {
@@ -122,10 +129,13 @@ def run_once(cases, seed):
             irrelevant=len(loaded-gold)
             overprompt=0.0 if not loaded else irrelevant/len(loaded)
             tok=active_tokens(cand,loaded)
+            # Scale token efficiency against monolithic active instructions.
             monolith=CANDIDATES["monolithic"]["core"]
             token_eff=max(0.0,1.0-min(tok/monolith,1.5)/1.5)
             constraint_ok=1.0 if case.hard < 2 else (1.0 if "constraints" in loaded else .35)
             composition_ok=1.0 if len(gold)<=1 else coverage**1.25
+            # Structural score: quality-first weights. Token efficiency cannot
+            # compensate for missing critical modules.
             score=100*(.48*coverage + .16*(1-overprompt) + .12*token_eff + .14*constraint_ok + .10*composition_ok)
             if coverage < .5 and gold: score -= 12
             score=max(0,min(100,score))

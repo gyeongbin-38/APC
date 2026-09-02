@@ -14,7 +14,7 @@ Write rough intent. APC adds only the prompt structure the task actually earns.
 
 **APC = Adaptive Prompt Compiler**
 
-[Quick start](#quick-start) · [How it works](#how-it-works) · [Benchmarks](#benchmarks) · [Public comparison](#public-repository-comparison) · [Archify map](docs/architecture/README.md)
+[Quick start](#quick-start) · [Usage guide](docs/USAGE.md) · [How it works](#how-it-works) · [Benchmarks](#benchmarks) · [Evidence ladder](benchmarks/README.md) · [Archify map](docs/architecture/README.md)
 
 </div>
 
@@ -165,10 +165,10 @@ APC keeps different claims in separate benchmark families so a convenient proxy 
 
 | Candidate | Score | Coverage | Overprompt | Constraint support | Active instruction proxy |
 |---|---:|---:|---:|---:|---:|
-| **adaptive-compiler** | **93.53** | **97.86%** | **1.98%** | **99.03%** | 934 |
-| typed-ir-router | 91.66 | 95.77% | 4.04% | 98.06% | 961 |
-| monolithic | 81.49 | 100% | 65.70% | 100% | 1,579 |
-| specialist-pack | 74.00 | 69.74% | 5.20% | 81.52% | 453 |
+| **adaptive-compiler** | **93.53** | **97.87%** | **1.97%** | **99.03%** | 974 |
+| typed-ir-router | 91.65 | 95.74% | 4.00% | 98.09% | 1,000 |
+| monolithic | 81.49 | 100% | 65.70% | 100% | 1,644 |
+| specialist-pack | 73.90 | 69.66% | 5.21% | 81.30% | 470 |
 
 In this benchmark, APC uses about **41% less active instruction payload** than the monolithic candidate while retaining high required-module coverage. The payload metric is `UTF-8 characters / 4`, not provider billing.
 
@@ -206,7 +206,7 @@ The optional deterministic compiler preserves **10,000 / 10,000** generated hard
 
 Real answer-quality claims are deliberately kept separate. `evals/model-backed/` contains clean-context **bare vs with-skill** fixtures for model-backed evaluation.
 
-Until those runs are completed across models/surfaces, APC does **not** claim a measured pass@1 or task-success uplift.
+Until those runs are completed across models/surfaces, APC does **not** claim a measured pass@1 or task-success uplift. See the controlled **[model-backed evaluation protocol](evals/model-backed/PROTOCOL.md)** for the planned paired A/B methodology.
 
 ## Public repository comparison
 
