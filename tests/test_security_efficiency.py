@@ -30,7 +30,7 @@ class SecurityEfficiencyTests(unittest.TestCase):
     def test_lazy_guard_is_routing_dependent(self):
         noise = self.data["routing_noise"]
         self.assertLess(noise["0.05"]["lazy_risky_recall"], 0.95)
-        self.assertLess(noise["0.10"]["lazy_risky_recall"], noise["0.05"]["lazy_risky_recall"])
+        self.assertLess(noise["0.1"]["lazy_risky_recall"], noise["0.05"]["lazy_risky_recall"])
 
 
 if __name__ == "__main__":
