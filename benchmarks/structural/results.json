@@ -1,0 +1,155 @@
+{
+  "method": "deterministic structural stress benchmark; no model calls",
+  "cases": 1000,
+  "monte_carlo_runs": 100,
+  "token_proxy": "UTF-8 characters / 4; not provider billing",
+  "skill_core_token_proxy": 591.5,
+  "reference_token_proxy": {
+    "handoff": 110.0,
+    "research": 158.8,
+    "constraints": 150.5,
+    "coding": 188.0,
+    "targets": 167.2,
+    "agentic": 212.5
+  },
+  "results": [
+    {
+      "candidate": "adaptive-compiler",
+      "score_mean": 93.53,
+      "score_p10": 93.24,
+      "score_p90": 93.79,
+      "coverage": 0.9786,
+      "overprompt": 0.0198,
+      "constraint_support": 0.9904,
+      "composition": 0.9822,
+      "active_tokens_proxy": 933.9,
+      "condition_scores": {
+        "simple": 95.38,
+        "rewrite": 94.46,
+        "creative": 94.42,
+        "structured": 94.63,
+        "coding": 93.16,
+        "research": 93.25,
+        "long-coding": 91.99,
+        "long-research": 92.15,
+        "handoff": 92.11,
+        "constraint-heavy": 93.73
+      }
+    },
+    {
+      "candidate": "typed-ir-router",
+      "score_mean": 91.66,
+      "score_p10": 91.24,
+      "score_p90": 92.01,
+      "coverage": 0.9577,
+      "overprompt": 0.0404,
+      "constraint_support": 0.9809,
+      "composition": 0.9649,
+      "active_tokens_proxy": 960.5,
+      "condition_scores": {
+        "simple": 94.05,
+        "rewrite": 92.54,
+        "creative": 92.36,
+        "structured": 92.76,
+        "coding": 91.17,
+        "research": 91.35,
+        "long-coding": 90.02,
+        "long-research": 90.28,
+        "handoff": 90.43,
+        "constraint-heavy": 91.67
+      }
+    },
+    {
+      "candidate": "thin-router",
+      "score_mean": 89.68,
+      "score_p10": 89.08,
+      "score_p90": 90.15,
+      "coverage": 0.9234,
+      "overprompt": 0.0682,
+      "constraint_support": 0.9648,
+      "composition": 0.9367,
+      "active_tokens_proxy": 805.8,
+      "condition_scores": {
+        "simple": 92.96,
+        "rewrite": 90.47,
+        "creative": 90.44,
+        "structured": 90.91,
+        "coding": 89.14,
+        "research": 89.27,
+        "long-coding": 87.96,
+        "long-research": 88.24,
+        "handoff": 88.27,
+        "constraint-heavy": 89.1
+      }
+    },
+    {
+      "candidate": "monolithic",
+      "score_mean": 81.49,
+      "score_p10": 81.49,
+      "score_p90": 81.49,
+      "coverage": 1.0,
+      "overprompt": 0.657,
+      "constraint_support": 1.0,
+      "composition": 1.0,
+      "active_tokens_proxy": 1578.5,
+      "condition_scores": {
+        "simple": 76.83,
+        "rewrite": 78.64,
+        "creative": 78.75,
+        "structured": 78.64,
+        "coding": 82.24,
+        "research": 82.08,
+        "long-coding": 85.89,
+        "long-research": 85.73,
+        "handoff": 86.11,
+        "constraint-heavy": 79.97
+      }
+    },
+    {
+      "candidate": "specialist-pack",
+      "score_mean": 73.91,
+      "score_p10": 73.15,
+      "score_p90": 74.61,
+      "coverage": 0.6974,
+      "overprompt": 0.052,
+      "constraint_support": 0.8091,
+      "composition": 0.6879,
+      "active_tokens_proxy": 453.1,
+      "condition_scores": {
+        "simple": 95.88,
+        "rewrite": 89.55,
+        "creative": 89.49,
+        "structured": 89.39,
+        "coding": 68.82,
+        "research": 70.11,
+        "long-coding": 50.13,
+        "long-research": 51.06,
+        "handoff": 50.04,
+        "constraint-heavy": 84.59
+      }
+    },
+    {
+      "candidate": "no-skill",
+      "score_mean": 36.99,
+      "score_p10": 36.99,
+      "score_p90": 36.99,
+      "coverage": 0.141,
+      "overprompt": 0.0,
+      "constraint_support": 0.6093,
+      "composition": 0.4,
+      "active_tokens_proxy": 0,
+      "condition_scores": {
+        "simple": 81.4,
+        "rewrite": 44.64,
+        "creative": 46.61,
+        "structured": 50.83,
+        "coding": 25.8,
+        "research": 26.57,
+        "long-coding": 22.63,
+        "long-research": 22.63,
+        "handoff": 22.81,
+        "constraint-heavy": 26.0
+      }
+    }
+  ]
+}
