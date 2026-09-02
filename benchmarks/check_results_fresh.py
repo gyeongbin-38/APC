@@ -13,6 +13,7 @@ FILES = [
     "benchmarks/constraint-fuzz/results.json",
     "benchmarks/public-repos/results.json",
     "benchmarks/security-adversarial/results.json",
+    "benchmarks/security-efficiency/results.json",
 ]
 
 
@@ -33,13 +34,7 @@ def main() -> int:
         if expected != actual:
             stale.append(path)
             print(f"STALE benchmark evidence: {path}")
-            for line in difflib.unified_diff(
-                normalized(expected),
-                normalized(actual),
-                fromfile=f"committed/{path}",
-                tofile=f"regenerated/{path}",
-                lineterm="",
-            ):
+            for line in difflib.unified_diff(normalized(expected), normalized(actual), fromfile=f"committed/{path}", tofile=f"regenerated/{path}", lineterm=""):
                 print(line)
     if stale:
         print("\nRegenerate and commit the changed benchmark results before merging.")

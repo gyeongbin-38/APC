@@ -21,5 +21,6 @@ jobs:
       - run: python benchmarks/constraint-fuzz/run_fuzz.py > /tmp/constraint-fuzz.json
       - run: python benchmarks/public-repos/run_benchmark.py > /tmp/public-repo-benchmark.json
       - run: python benchmarks/security-adversarial/run_benchmark.py > /tmp/security-benchmark.json
+      - run: python benchmarks/security-efficiency/run_benchmark.py > /tmp/security-efficiency.json
       - name: Verify committed benchmark evidence is fresh
         run: python benchmarks/check_results_fresh.py
