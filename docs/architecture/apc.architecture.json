@@ -26,14 +26,14 @@
   "connections": [
     {"from":"user","to":"host","variant":"emphasis"},
     {"from":"host","to":"core","label":"activate"},
-    {"from":"core","to":"ir","label":"compile intent","variant":"emphasis"},
+    {"from":"core","to":"ir","label":"compile intent","labelAt":[615,358],"variant":"emphasis"},
     {"from":"core","to":"refs","label":"select","fromSide":"top","toSide":"bottom","variant":"dashed"},
     {"from":"refs","to":"compiler","label":"only relevant guidance","fromSide":"right","toSide":"top","variant":"dashed"},
     {"from":"ir","to":"compiler","variant":"emphasis"},
-    {"from":"compiler","to":"target","label":"ready-to-use prompt","variant":"emphasis"},
-    {"from":"ir","to":"scripts","label":"optional deterministic path","fromSide":"bottom","toSide":"top","variant":"dashed"},
-    {"from":"compiler","to":"evals","label":"verify","fromSide":"bottom","toSide":"top","variant":"security"},
-    {"from":"evals","to":"bench","label":"publish evidence","variant":"dashed"}
+    {"from":"compiler","to":"target","label":"ready-to-use prompt","labelAt":[1065,358],"variant":"emphasis"},
+    {"from":"ir","to":"scripts","label":"optional deterministic path","labelAt":[725,358],"fromSide":"bottom","toSide":"top","variant":"dashed"},
+    {"from":"compiler","to":"evals","label":"verify","labelAt":[950,358],"fromSide":"bottom","toSide":"top","variant":"security"},
+    {"from":"evals","to":"bench","label":"publish evidence","labelAt":[1065,548],"variant":"dashed"}
   ],
   "cards": [
     {"dot":"cyan","title":"Runtime path","items":["Simple tasks stay simple instead of inheriting a giant template","Complex tasks are represented as a compact Prompt IR","Only task-relevant reference modules are loaded"]},
