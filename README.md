@@ -9,7 +9,7 @@ Write rough intent. APC adds only the prompt structure the task actually earns.
 [![CI](https://github.com/gyeongbin-38/APC/actions/workflows/validate.yml/badge.svg)](https://github.com/gyeongbin-38/APC/actions/workflows/validate.yml)
 ![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)
-![Structural](https://img.shields.io/badge/structural-93.53%2F100-0891b2?style=flat-square)
+![Structural](https://img.shields.io/badge/structural-93.42%2F100-0891b2?style=flat-square)
 ![RPE](https://img.shields.io/badge/RPE-80.39%2F100-f59e0b?style=flat-square)
 
 **APC = Adaptive Prompt Compiler**
@@ -44,13 +44,14 @@ target-aware prompt
 
 | Evidence | Current result | What it measures |
 |---|---:|---|
-| **Structural architecture score** | **93.53 / 100** | coverage, overprompt, constraint support, active payload across 1,000 synthetic tasks × 100 routing-noise runs |
+| **Structural architecture score** | **93.42 / 100** | coverage, overprompt, constraint support, active payload across 1,000 synthetic tasks × 100 routing-noise runs |
 | **RPE score — public repos** | **80.39 / 100** | metadata trigger separability + runtime `SKILL.md` payload against four public prompt-optimizer Skills |
 | **Trigger boundary** | **0.720 F1** | 140-case lexical near-miss routing proxy |
 | **Constraint fuzz** | **10,000 / 10,000** | literal preservation through the optional deterministic Prompt IR emitter |
+| **Security posture** | **15 / 15 controls** | static supply-chain/runtime/trust-boundary controls + inert payload checks; not a model jailbreak score |
 | **Model-backed task success** | **Pending** | clean-context bare-vs-skill A/B; no pass@1 uplift is claimed yet |
 
-**Important:** the first four are deterministic/proxy benchmarks, not LLM accuracy. See the linked reports before quoting the numbers.
+**Important:** the first five are deterministic/proxy benchmarks, not LLM accuracy. See the linked reports before quoting the numbers.
 
 ## Quick start
 
@@ -118,7 +119,7 @@ For the deeper interactive system view, open the **[Archify architecture map](do
 
 ```text
 skill/adaptive-prompt-compiler/
-├── SKILL.md                 # ~2.4 KB runtime router/compiler
+├── SKILL.md                 # ~2.6 KB runtime router/compiler
 ├── references/
 │   ├── coding.md
 │   ├── research.md
@@ -165,12 +166,12 @@ APC keeps different claims in separate benchmark families so a convenient proxy 
 
 | Candidate | Score | Coverage | Overprompt | Constraint support | Active instruction proxy |
 |---|---:|---:|---:|---:|---:|
-| **adaptive-compiler** | **93.53** | **97.87%** | **1.97%** | **99.03%** | 974 |
-| typed-ir-router | 91.65 | 95.74% | 4.00% | 98.09% | 1,000 |
-| monolithic | 81.49 | 100% | 65.70% | 100% | 1,644 |
-| specialist-pack | 73.90 | 69.66% | 5.21% | 81.30% | 470 |
+| **adaptive-compiler** | **93.42** | **97.87%** | **1.97%** | **99.03%** | 1,027 |
+| typed-ir-router | 91.81 | 95.74% | 4.00% | 98.09% | 1,000 |
+| monolithic | 81.49 | 100% | 65.70% | 100% | 1,697 |
+| specialist-pack | 73.97 | 69.66% | 5.21% | 81.30% | 470 |
 
-In this benchmark, APC uses about **41% less active instruction payload** than the monolithic candidate while retaining high required-module coverage. The payload metric is `UTF-8 characters / 4`, not provider billing.
+In this benchmark, APC uses about **39% less active instruction payload** than the monolithic candidate while retaining high required-module coverage. The payload metric is `UTF-8 characters / 4`, not provider billing.
 
 [Methodology and limitations →](benchmarks/structural/REPORT.md)
 
@@ -180,7 +181,7 @@ The **RPE score (Routing & Payload Efficiency)** compares APC with public prompt
 
 | Rank | Public Skill | RPE score | Trigger F1 | Runtime `SKILL.md` |
 |---:|---|---:|---:|---:|
-| 1 | **APC** | **80.39** | **0.720** | **2,366 B** |
+| 1 | **APC** | **80.39** | **0.720** | **2,579 B** |
 | 2 | Sentry `prompt-optimizer` | 75.16 | 0.693 | 4,613 B |
 | 3 | Kanner `prompt-optimizer` | 62.01 | 0.679 | 8,504 B |
 | 4 | Talki `prompt-optimizer` | 58.34 | 0.704 | 13,558 B |
@@ -202,7 +203,15 @@ The optional deterministic compiler preserves **10,000 / 10,000** generated hard
 
 [Constraint fuzz report →](benchmarks/constraint-fuzz/REPORT.md)
 
-### 4. Model-backed A/B
+### 4. Security posture benchmark
+
+A deterministic security suite checks 15 repository/runtime controls: no network/subprocess/eval/exec in the optional emitter, strict IR validation and size bounds, an explicit untrusted-content boundary, immutable Action/Archify pins, read-only validation CI, no `pull_request_target`, credential isolation during third-party rendering, and inert handling of suspicious payload strings.
+
+Current result: **15 / 15 controls pass**. This is a static/deterministic posture check, **not** proof of model-level jailbreak resistance. A separate adversarial model corpus is included under `evals/security-adversarial/`.
+
+[Security benchmark →](benchmarks/security-adversarial/REPORT.md) · [Security policy →](SECURITY.md)
+
+### 5. Model-backed A/B
 
 Real answer-quality claims are deliberately kept separate. `evals/model-backed/` contains clean-context **bare vs with-skill** fixtures for model-backed evaluation.
 
@@ -254,6 +263,7 @@ benchmarks/structural/          architecture stress test
 benchmarks/trigger-boundary/    metadata near-miss proxy
 benchmarks/constraint-fuzz/     deterministic constraint preservation
 benchmarks/public-repos/        pinned public competitor comparison
+benchmarks/security-adversarial/ security posture and inert-payload controls
 ```
 
 Run the deterministic suite locally:
@@ -264,6 +274,7 @@ python benchmarks/structural/run_benchmark.py
 python benchmarks/trigger-boundary/run_benchmark.py
 python benchmarks/constraint-fuzz/run_fuzz.py
 python benchmarks/public-repos/run_benchmark.py
+python benchmarks/security-adversarial/run_benchmark.py
 ```
 
 ## Design principles
