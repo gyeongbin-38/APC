@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Adaptive Prompt Compiler IR",
+  "type": "object",
+  "required": ["objective"],
+  "properties": {
+    "objective": {"type": "string", "minLength": 1},
+    "target": {"type": "string"},
+    "deliverable": {"type": "string"},
+    "hard_constraints": {"type": "array", "items": {"type": "string"}},
+    "preferences": {"type": "array", "items": {"type": "string"}},
+    "non_goals": {"type": "array", "items": {"type": "string"}},
+    "context": {"type": "array", "items": {"type": "string"}},
+    "success_criteria": {"type": "array", "items": {"type": "string"}},
+    "verification": {"type": "array", "items": {"type": "string"}},
+    "complexity": {"enum": ["simple", "structured", "agentic"]}
+  },
+  "additionalProperties": false
+}
