@@ -12,6 +12,7 @@ FILES = [
     "benchmarks/trigger-boundary/results.json",
     "benchmarks/constraint-fuzz/results.json",
     "benchmarks/public-repos/results.json",
+    "benchmarks/security-adversarial/results.json",
 ]
 
 

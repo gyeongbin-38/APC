@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2 — Security hardening
+
+- Added an explicit untrusted-content boundary to the always-on Skill core.
+- Hardened the deterministic Prompt IR emitter with unknown-field/type/size validation and graceful input errors.
+- Pinned GitHub Actions and Archify execution to immutable commit SHAs.
+- Removed persisted repository credentials while external Archify code executes.
+- Added a 15-control security posture benchmark and adversarial model-eval corpus.
+- Added benchmark freshness and determinism regression coverage.
+
 ## 0.1.0 — 2026-09-02
 
 - Initial public experimental release.
