@@ -1,55 +1,73 @@
-# Adaptive Prompt Compiler
+<div align="center">
 
-A portable Agent Skill that turns rough intent into the **smallest prompt that still preserves task quality**.
+# APC
+### Adaptive Prompt Compiler
 
-Instead of applying one giant prompt-engineering template to every request, Adaptive Prompt Compiler classifies task complexity and loads only the guidance the task actually needs.
+**Prompt engineering as a compiler pass.**<br>
+Write rough intent. APC adds only the prompt structure the task actually earns.
+
+[![CI](https://github.com/gyeongbin-38/APC/actions/workflows/validate.yml/badge.svg)](https://github.com/gyeongbin-38/APC/actions/workflows/validate.yml)
+![Agent Skill](https://img.shields.io/badge/Agent-Skill-7C3AED?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)
+![Structural](https://img.shields.io/badge/structural-93.53%2F100-0891b2?style=flat-square)
+![RPE](https://img.shields.io/badge/RPE-80.39%2F100-f59e0b?style=flat-square)
+
+**APC = Adaptive Prompt Compiler**
+
+[Quick start](#quick-start) · [How it works](#how-it-works) · [Benchmarks](#benchmarks) · [Public comparison](#public-repository-comparison) · [Archify map](docs/architecture/README.md)
+
+</div>
+
+---
+
+APC is a portable Agent Skill that turns a request for another AI into the **minimum-sufficient prompt** for that task.
+
+A simple task stays simple. A coding, research, handoff, or long-running task can progressively load stronger guidance without making every prompt inherit one giant checklist.
 
 ```text
 rough intent
-   ↓
-compact prompt IR
-   ↓
-complexity + risk classification
-   ↓
-load only relevant references
-   ↓
+    ↓
+thin skill core
+    ↓
+compact Prompt IR
+    ↓
+complexity + risk gate
+    ↓
+load only relevant guidance
+    ↓
 target-aware prompt
 ```
 
-## Why
+> **Quality first. Token savings second.** APC removes irrelevant prompt overhead before it considers compressing anything decision-critical.
 
-Modern models often need *less* prompt scaffolding than prompt-engineering folklore suggests, while complex coding/research/agent tasks still benefit from explicit constraints, evidence rules, and verification. The skill therefore optimizes for **tokens per successful task**, not minimum tokens in isolation.
+## Benchmark snapshot
 
-### Design goals
+| Evidence | Current result | What it measures |
+|---|---:|---|
+| **Structural architecture score** | **93.53 / 100** | coverage, overprompt, constraint support, active payload across 1,000 synthetic tasks × 100 routing-noise runs |
+| **RPE score — public repos** | **80.39 / 100** | metadata trigger separability + runtime `SKILL.md` payload against four public prompt-optimizer Skills |
+| **Trigger boundary** | **0.720 F1** | 140-case lexical near-miss routing proxy |
+| **Constraint fuzz** | **10,000 / 10,000** | literal preservation through the optional deterministic Prompt IR emitter |
+| **Model-backed task success** | **Pending** | clean-context bare-vs-skill A/B; no pass@1 uplift is claimed yet |
 
-- **Portable:** follows the Agent Skills folder format.
-- **Progressive:** thin `SKILL.md`; detailed guidance lives in on-demand references.
-- **Adaptive:** simple tasks stay simple; agentic tasks get stronger context/verification rules.
-- **Constraint-safe:** hard constraints are kept distinct from preferences and non-goals.
-- **Target-aware:** coding, research, review, and general-model prompts are emitted differently.
-- **Eval-first:** public eval cases and structural benchmarks live outside the runtime skill.
-- **Zero dependency at runtime:** the skill works without scripts; optional emitters use Python stdlib only.
+**Important:** the first four are deterministic/proxy benchmarks, not LLM accuracy. See the linked reports before quoting the numbers.
 
-## Install
+## Quick start
 
-Install directly from GitHub with the open `skills` CLI:
+Install with the open `skills` CLI:
 
 ```bash
 npx skills add gyeongbin-38/APC --skill adaptive-prompt-compiler
 ```
 
-Or copy `skill/adaptive-prompt-compiler/` into a skills directory supported by your client:
+Or copy the skill directory into a client-supported skills folder:
 
 ```bash
 mkdir -p .agents/skills
 cp -R skill/adaptive-prompt-compiler .agents/skills/
 ```
 
-Exact installation paths vary by client. The skill itself stays platform-neutral.
-
-## Use
-
-Ask naturally:
+Then ask naturally:
 
 ```text
 Create a prompt for a coding agent to fix this bug without refactoring unrelated code.
@@ -63,21 +81,44 @@ Rewrite this research prompt so the agent checks primary sources and reports unc
 Make this system prompt shorter without losing any hard constraints.
 ```
 
-The skill should **not** activate for ordinary questions such as:
+APC should **not** activate for ordinary requests such as `What is prompt engineering?` unless the user actually wants a reusable prompt or AI instruction.
+
+## How it works
+
+APC uses a deliberately small runtime core and progressively loads task-specific references.
 
 ```text
-What is prompt engineering?
+User Intent
+    │
+    ▼
+┌────────────────────┐
+│ Thin SKILL.md Core │  classify only what matters
+└─────────┬──────────┘
+          ▼
+     ┌───────────┐
+     │ Prompt IR │  objective · hard constraints · success
+     └─────┬─────┘
+           │
+       ┌───┴───────────────┐
+       │ condition-gated   │
+       ▼                   ▼
+  JIT references     optional emitter
+       │                   │
+       └────────┬──────────┘
+                ▼
+        Target-aware Prompt
+                │
+                ▼
+            Target AI
 ```
 
-unless the user also asks for an actual reusable prompt.
+For the deeper interactive system view, open the **[Archify architecture map](docs/architecture/README.md)**. The diagram is generated from typed JSON IR and validated with pinned Archify `v2.16.0`.
 
-## Architecture
-
-The runtime skill is intentionally small:
+### Runtime package
 
 ```text
 skill/adaptive-prompt-compiler/
-├── SKILL.md
+├── SKILL.md                 # ~2.4 KB runtime router/compiler
 ├── references/
 │   ├── coding.md
 │   ├── research.md
@@ -86,17 +127,17 @@ skill/adaptive-prompt-compiler/
 │   ├── constraints.md
 │   └── targets.md
 ├── scripts/
-│   ├── compile_prompt.py
+│   ├── compile_prompt.py    # optional deterministic path
 │   └── validate_ir.py
 └── assets/
     └── prompt-ir.schema.json
 ```
 
-`SKILL.md` performs routing and compilation. References are loaded only when relevant. The scripts are optional deterministic helpers for hosts that support code execution.
+The core does not load a reference merely because it exists.
 
-## Prompt IR
+### Prompt IR
 
-The model-native compiler uses a compact conceptual IR. Only material fields should exist:
+Only material fields need to exist:
 
 ```json
 {
@@ -108,51 +149,19 @@ The model-native compiler uses a compact conceptual IR. Only material fields sho
 }
 ```
 
-The optional deterministic emitter can compile a JSON IR:
+Hosts with code execution can optionally compile JSON IR deterministically:
 
 ```bash
 python skill/adaptive-prompt-compiler/scripts/compile_prompt.py examples/ir-coding.json
 ```
 
-## What is different from other prompt compilers?
+## Benchmarks
 
-This project is deliberately narrower than prompt-management platforms and broader than long-running-loop generators.
+APC keeps different claims in separate benchmark families so a convenient proxy cannot masquerade as model quality.
 
-It focuses on one reusable primitive:
+### 1. Structural architecture benchmark
 
-> **Given a request to create instructions for another AI, compile only the prompt structure that task earns.**
-
-It does not require an API key, model router, database, prompt marketplace, autonomous loop runtime, or proprietary format.
-
-## Evaluation
-
-There are two evaluation layers:
-
-1. `evals/` — realistic behavior/trigger cases for real model runs.
-2. `benchmarks/structural/` — deterministic structural tests for routing cost, module coverage, constraint preservation, and prompt overhead.
-
-The structural benchmark is **not** an LLM pass@1 benchmark. It exists to compare architecture choices before spending API tokens.
-
-Run local checks:
-
-```bash
-python -m unittest discover -s tests -v
-python benchmarks/structural/run_benchmark.py
-```
-
-For model-backed evaluation, use the supplied `evals/evals.json` with an Agent Skills eval runner, promptfoo, SkillsBench, or another clean-context with-skill/without-skill harness.
-
-## Current benchmark conclusion
-
-The current structural benchmark favors a **thin unified skill + typed prompt IR + condition-gated references** over:
-
-- one monolithic universal prompt skill;
-- many overlapping specialist prompt skills;
-- always-on context/token optimization.
-
-See `benchmarks/structural/REPORT.md` for methods and limitations.
-
-### Current structural result
+1,000 synthetic task cards across simple, rewrite, creative, coding, research, long-running, handoff, and constraint-heavy conditions are evaluated over 100 seeded routing-noise runs.
 
 | Candidate | Score | Coverage | Overprompt | Constraint support | Active instruction proxy |
 |---|---:|---:|---:|---:|---:|
@@ -161,23 +170,115 @@ See `benchmarks/structural/REPORT.md` for methods and limitations.
 | monolithic | 81.49 | 100% | 65.70% | 100% | 1,579 |
 | specialist-pack | 74.00 | 69.74% | 5.20% | 81.52% | 453 |
 
-The active-instruction metric is a `UTF-8 characters / 4` payload proxy, not provider billing. The adaptive candidate uses about **41% less active instruction payload** than the monolithic candidate in this benchmark while preserving high required-module coverage.
+In this benchmark, APC uses about **41% less active instruction payload** than the monolithic candidate while retaining high required-module coverage. The payload metric is `UTF-8 characters / 4`, not provider billing.
 
-A second 140-case trigger-boundary benchmark tests description separability against near misses. The current description ranked first among four candidates, but this is also a lexical proxy—not real router accuracy. See `benchmarks/trigger-boundary/REPORT.md`.
+[Methodology and limitations →](benchmarks/structural/REPORT.md)
 
-### Real model A/B
+### 2. Public repository benchmark
 
-No independent model-success uplift is claimed yet. Clean-context bare-vs-skill fixtures and a Promptfoo/Codex example live in `evals/model-backed/`. The build environment used for v0.1.1 had no provider credentials or Codex executable, so model-backed numbers are intentionally left pending rather than inferred from structural scores.
+The **RPE score (Routing & Payload Efficiency)** compares APC with public prompt-authoring Agent Skills using their actual published descriptions, runtime Skill sizes, and pinned Git blob identities.
 
-## Principles
+| Rank | Public Skill | RPE score | Trigger F1 | Runtime `SKILL.md` |
+|---:|---|---:|---:|---:|
+| 1 | **APC** | **80.39** | **0.720** | **2,366 B** |
+| 2 | Sentry `prompt-optimizer` | 75.16 | 0.693 | 4,613 B |
+| 3 | Kanner `prompt-optimizer` | 62.01 | 0.679 | 8,504 B |
+| 4 | Talki `prompt-optimizer` | 58.34 | 0.704 | 13,558 B |
+| 5 | GitHub `awesome-copilot` prompt optimizer | 53.88 | 0.681 | 19,876 B |
 
-1. Quality first; token savings second.
+RPE is intentionally narrow:
+
+```text
+100 × (0.70 × trigger_F1 + 0.30 × min(1, 4096 / SKILL_bytes))
+```
+
+It measures **activation-boundary separability and runtime payload efficiency only**. It does **not** say APC produces better answers than Sentry, GitHub, Talki, or Kanner. Sentry in particular is a strong architecture reference because its public Skill also uses progressive disclosure and eval-driven optimization.
+
+[Reproduce the public-repo benchmark →](benchmarks/public-repos/REPORT.md)
+
+### 3. Constraint fuzz
+
+The optional deterministic compiler preserves **10,000 / 10,000** generated hard-constraint literals in the current fuzz corpus. This proves compiler preservation—not downstream LLM compliance.
+
+[Constraint fuzz report →](benchmarks/constraint-fuzz/REPORT.md)
+
+### 4. Model-backed A/B
+
+Real answer-quality claims are deliberately kept separate. `evals/model-backed/` contains clean-context **bare vs with-skill** fixtures for model-backed evaluation.
+
+Until those runs are completed across models/surfaces, APC does **not** claim a measured pass@1 or task-success uplift.
+
+## Public repository comparison
+
+The direct comparison set is intentionally limited to repositories that expose a reusable prompt-authoring/optimization Skill. Famous adjacent projects are used as design references but are not forced into an unfair single score.
+
+### Direct prompt-authoring competitors
+
+| Project | Strongest public characteristic | APC difference |
+|---|---|---|
+| `getsentry/skills` · prompt-optimizer | progressive disclosure, contract capture, eval loop | smaller core + explicit complexity gating + public routing/payload benchmark |
+| `github/awesome-copilot` · prompt-optimizer | extensive chat-prompt cookbook and finished-output rules | APC keeps the always-loaded core much smaller and condition-gates detailed guidance |
+| `talki-io/prompt-optimizer` | very explicit semantic-preservation/editor boundary | APC also authors new prompts and handles agentic/handoff cases conditionally |
+| `ckanner/agent-skills` · prompt-optimizer | conventional systematic optimization workflow | APC emphasizes adaptive complexity and minimum-sufficient prompt structure |
+
+### Famous / adjacent reference repositories
+
+These influence the design but are **not ranked by RPE because their jobs differ**:
+
+- `openai/skills` / Agent Skills patterns — progressive disclosure and reusable skill packaging.
+- `addyosmani/agent-skills` — production-oriented context engineering patterns.
+- `Supersynergy/agent-token-saver` — measured token/context reduction and evidence that optimization can regress on some workloads.
+- `pro-vi/loopgen` — prompt compilation for long-running autonomous loops.
+- `tt-a1i/archify` — typed IR + deterministic renderer pattern used for APC's architecture visualization.
+
+The exact competitive sources and immutable blob pins are documented in **[Competitive Landscape](docs/COMPETITIVE_LANDSCAPE.md)** and `benchmarks/public-repos/sources.json`.
+
+## Why APC instead of one giant prompt template?
+
+A universal checklist maximizes rule coverage by paying an irrelevant-context tax on every task. APC instead treats prompting more like compilation:
+
+1. capture the task contract;
+2. classify complexity and material risk;
+3. construct a compact Prompt IR;
+4. load only the references that resolve real needs;
+5. emit a target-appropriate prompt;
+6. verify hard constraints and success criteria proportionally.
+
+The goal is not the shortest prompt. It is the **smallest prompt with equivalent expected task success**.
+
+## Evaluation layout
+
+```text
+evals/                          real-model cases / trigger corpus
+benchmarks/structural/          architecture stress test
+benchmarks/trigger-boundary/    metadata near-miss proxy
+benchmarks/constraint-fuzz/     deterministic constraint preservation
+benchmarks/public-repos/        pinned public competitor comparison
+```
+
+Run the deterministic suite locally:
+
+```bash
+python -m unittest discover -s tests -v
+python benchmarks/structural/run_benchmark.py
+python benchmarks/trigger-boundary/run_benchmark.py
+python benchmarks/constraint-fuzz/run_fuzz.py
+python benchmarks/public-repos/run_benchmark.py
+```
+
+## Design principles
+
+1. **Quality first; token savings second.**
 2. Remove irrelevant context before compressing critical context.
 3. Hard constraints never become optional because a prompt was shortened.
 4. Simple tasks should not inherit agentic machinery.
-5. Exact evidence beats generic semantic similarity for decision-critical facts.
+5. Exact evidence beats generic similarity for decision-critical facts.
 6. Execution is not verification.
-7. Public benchmark claims must label estimates separately from provider-reported tokens.
+7. Public benchmark claims label proxies separately from provider/model measurements.
+
+## Contributing
+
+Adversarial trigger cases, failed prompts, model-backed A/B results, and competing public Skill examples are especially useful. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
