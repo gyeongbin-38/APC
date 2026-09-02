@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+import argparse, json, sys
+from pathlib import Path
+ALLOWED_COMPLEXITY={"simple","structured","agentic"}
+LIST_FIELDS=("hard_constraints","preferences","non_goals","context","success_criteria","verification")
+def validate(ir:dict)->list[str]:
+    errors=[]
+    if not isinstance(ir,dict): return ["IR must be a JSON object"]
+    if not isinstance(ir.get("objective"),str) or not ir.get("objective","").strip(): errors.append("objective must be a non-empty string")
+    c=ir.get("complexity")
+    if c is not None and c not in ALLOWED_COMPLEXITY: errors.append(f"complexity must be one of {sorted(ALLOWED_COMPLEXITY)}")
+    for field in LIST_FIELDS:
+        if field in ir and (not isinstance(ir[field],list) or not all(isinstance(x,str) for x in ir[field])): errors.append(f"{field} must be an array of strings")
+    return errors
+def bullets(title:str,values:list[str])->list[str]:
+    return [] if not values else [f"## {title}",*[f"- {x}" for x in values],""]
+def compile_ir(ir:dict)->str:
+    errors=validate(ir)
+    if errors: raise ValueError("; ".join(errors))
+    complexity=ir.get("complexity","structured"); out=["# Task","",ir["objective"].strip(),""]
+    if ir.get("target"): out += ["## Target",ir["target"].strip(),""]
+    if ir.get("deliverable"): out += ["## Deliverable",ir["deliverable"].strip(),""]
+    out += bullets("Hard constraints",ir.get("hard_constraints",[]))
+    if complexity != "simple": out += bullets("Success criteria",ir.get("success_criteria",[]))+bullets("Context",ir.get("context",[]))
+    out += bullets("Preferences",ir.get("preferences",[]))+bullets("Out of scope",ir.get("non_goals",[]))
+    if complexity != "simple": out += bullets("Verification",ir.get("verification",[]))
+    return "\n".join(out).rstrip()+"\n"
+def main()->int:
+    p=argparse.ArgumentParser(); p.add_argument("input",type=Path); p.add_argument("-o","--output",type=Path); args=p.parse_args(); ir=json.loads(args.input.read_text(encoding="utf-8"))
+    try: prompt=compile_ir(ir)
+    except ValueError as e: print(f"invalid IR: {e}",file=sys.stderr); return 2
+    if args.output: args.output.write_text(prompt,encoding="utf-8")
+    else: sys.stdout.write(prompt)
+    return 0
+if __name__=="__main__": raise SystemExit(main())
