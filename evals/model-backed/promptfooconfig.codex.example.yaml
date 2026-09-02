@@ -1,0 +1,31 @@
+description: Adaptive Prompt Compiler — bare vs skill smoke comparison
+prompts:
+  - '{{request}}'
+providers:
+  - id: openai:codex-sdk
+    label: bare
+    config:
+      model: gpt-5.5
+      working_dir: ./evals/model-backed/fixtures/bare
+      skip_git_repo_check: true
+      sandbox_mode: read-only
+      enable_streaming: true
+  - id: openai:codex-sdk
+    label: with-skill
+    config:
+      model: gpt-5.5
+      working_dir: ./evals/model-backed/fixtures/with-skill
+      skip_git_repo_check: true
+      sandbox_mode: read-only
+      enable_streaming: true
+
+tests:
+  - description: coding-agent prompt
+    vars:
+      request: Create a Codex prompt to fix a failing payment retry test. Keep the current architecture, avoid unrelated refactors, and require tests.
+  - description: simple creative prompt
+    vars:
+      request: Create a short prompt for an image model: a minimalist cybernetic chick profile icon on transparent background.
+  - description: constraint-preserving rewrite
+    vars:
+      request: Shorten this prompt but preserve every MUST/NEVER rule semantically unchanged.
