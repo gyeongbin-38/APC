@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "APC — Adaptive Prompt Compiler",
+    "subtitle": "Rough intent → compact IR → JIT guidance → minimum-sufficient prompt",
+    "output": "docs/architecture/apc.html",
+    "visual_preset": "signal-flow",
+    "animation": "trace"
+  },
+  "components": [
+    {"id":"user","type":"external","label":"User Intent","sublabel":"rough request","pos":[40,280],"size":[130,64]},
+    {"id":"host","type":"frontend","label":"Agent Host","sublabel":"ChatGPT · Codex · others","pos":[210,280],"size":[160,64]},
+    {"id":"core","type":"backend","label":"Thin Skill Core","sublabel":"classify complexity + risk","pos":[420,280],"size":[170,64],"tag":"~2.4 KB"},
+    {"id":"ir","type":"messagebus","label":"Prompt IR","sublabel":"objective · constraints · success","pos":[640,280],"size":[170,64]},
+    {"id":"refs","type":"database","label":"JIT References","sublabel":"coding · research · handoff","pos":[640,100],"size":[170,64],"tag":"load only when needed"},
+    {"id":"compiler","type":"backend","label":"Prompt Compiler","sublabel":"minimum sufficient structure","pos":[860,280],"size":[180,64]},
+    {"id":"target","type":"external","label":"Target AI","sublabel":"model / coding agent / researcher","pos":[1090,280],"size":[180,64]},
+    {"id":"scripts","type":"cloud","label":"Optional Emitter","sublabel":"stdlib Python · deterministic","pos":[640,470],"size":[170,64]},
+    {"id":"evals","type":"security","label":"Eval Gates","sublabel":"trigger · constraints · A/B","pos":[860,470],"size":[180,64]},
+    {"id":"bench","type":"cloud","label":"Public Benchmarks","sublabel":"structural · public repos","pos":[1090,470],"size":[180,64]}
+  ],
+  "boundaries": [
+    {"kind":"region","label":"adaptive-prompt-compiler Skill package","wraps":["core","ir","refs","compiler","scripts"]}
+  ],
+  "connections": [
+    {"from":"user","to":"host","variant":"emphasis"},
+    {"from":"host","to":"core","label":"activate"},
+    {"from":"core","to":"ir","label":"compile intent","variant":"emphasis"},
+    {"from":"core","to":"refs","label":"select","fromSide":"top","toSide":"bottom","variant":"dashed"},
+    {"from":"refs","to":"compiler","label":"only relevant guidance","fromSide":"right","toSide":"top","variant":"dashed"},
+    {"from":"ir","to":"compiler","variant":"emphasis"},
+    {"from":"compiler","to":"target","label":"ready-to-use prompt","variant":"emphasis"},
+    {"from":"ir","to":"scripts","label":"optional deterministic path","fromSide":"bottom","toSide":"top","variant":"dashed"},
+    {"from":"compiler","to":"evals","label":"verify","fromSide":"bottom","toSide":"top","variant":"security"},
+    {"from":"evals","to":"bench","label":"publish evidence","variant":"dashed"}
+  ],
+  "cards": [
+    {"dot":"cyan","title":"Runtime path","items":["Simple tasks stay simple instead of inheriting a giant template","Complex tasks are represented as a compact Prompt IR","Only task-relevant reference modules are loaded"]},
+    {"dot":"emerald","title":"Quality contract","items":["Hard constraints stay distinct from preferences","Success criteria are added only when they materially help","Token savings are subordinate to expected task success"]},
+    {"dot":"rose","title":"Evidence path","items":["Trigger boundary, structural, and constraint fuzz tests are public","Public-repository comparisons pin exact Git blob identities","Model-backed pass@1 claims remain separate until measured"]}
+  ]
+}

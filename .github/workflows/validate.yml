@@ -15,3 +15,4 @@ jobs:
       - run: python benchmarks/structural/run_benchmark.py > /tmp/benchmark.json
       - run: python benchmarks/trigger-boundary/run_benchmark.py > /tmp/trigger-benchmark.json
       - run: python benchmarks/constraint-fuzz/run_fuzz.py > /tmp/constraint-fuzz.json
+      - run: python benchmarks/public-repos/run_benchmark.py > /tmp/public-repo-benchmark.json
