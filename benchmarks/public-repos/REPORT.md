@@ -13,7 +13,7 @@ It **does not claim prompt-output quality, pass@1, or downstream task-success su
 
 | Rank | Skill | Routing & Payload Score | Trigger F1 | SKILL.md |
 |---:|---|---:|---:|---:|
-| 1 | APC | **80.39** | 0.720 | 2,366 B |
+| 1 | APC | **80.39** | 0.720 | 2,579 B |
 | 2 | Sentry prompt-optimizer | **75.16** | 0.693 | 4,613 B |
 | 3 | Kanner prompt-optimizer | **62.01** | 0.679 | 8,504 B |
 | 4 | Talki prompt-optimizer | **58.34** | 0.704 | 13,558 B |
